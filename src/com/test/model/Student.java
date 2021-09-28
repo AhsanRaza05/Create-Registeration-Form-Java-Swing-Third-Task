@@ -10,7 +10,6 @@ package com.test.model;
  * @author Ahsan
  */
 public class Student {
-    
     private String name;
     private String rollNo, email;
     private String gender;
@@ -20,12 +19,13 @@ public class Student {
     
     private Integer age; 
     private Integer fee;
-
+    private Integer id;
+    
     public Student(){
         
     }
     
-    public Student(String name, String rollNo, String email, String gender, String department, String city, String address, Integer age, Integer fee) {
+    public Student(String name, String rollNo, String email, String gender, String department, String city, String address, Integer age, Integer fee, Integer id) {
         this.name = name;
         this.rollNo = rollNo;
         this.email = email;
@@ -35,6 +35,7 @@ public class Student {
         this.address = address;
         this.age = age;
         this.fee = fee;
+        this.id = id;
     }
 
     public String getName() {
@@ -107,6 +108,14 @@ public class Student {
 
     public void setFee(Integer fee) {
         this.fee = fee;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
     
     

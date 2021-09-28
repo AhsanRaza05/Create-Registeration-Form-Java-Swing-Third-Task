@@ -12,23 +12,17 @@ import java.util.List;
  *
  * @author Ahsan
  */
-public interface studentDao {
+public interface StudentDAO {
     
     boolean addStudent(Student s);
     
-    boolean deleteStudent(Student s);
+    boolean deleteStudent(Integer id);
     
     boolean updateStudent(Student s);
-    
-    Integer getDepartmentId(String deptName);
     
     List getAllStudent();
     
     Student getSpecificStudent();
     
-    List getAlldepartments();
-    
     List getAllCities();
-    
-    String getDepartmentName(Integer id);
 }

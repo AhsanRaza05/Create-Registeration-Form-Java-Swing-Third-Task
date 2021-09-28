@@ -5,6 +5,9 @@
  */
 package com.test.userinterface;
 
+import com.test.dao.DepartmentDAO;
+import com.test.dao.StudentDAO;
+import com.test.daoimpl.DepartmentDAOImp;
 import com.test.daoimpl.StudentDAOImp;
 import com.test.model.Student;
 import java.awt.Color;
@@ -21,10 +24,11 @@ public class RegisterationForm extends javax.swing.JFrame {
     /**
      * Creates new form RegisterationForm
      */
-    Object columnNames[] = {"Name", "Roll No", "Age", "Fee", "Email", "Gender", "Department", "City", "Address"}; 
+    Object columnNames[] = {"id","Name", "Roll No", "Age", "Fee", "Email", "Gender", "Department", "City", "Address"}; 
     
     DefaultTableModel defaultTableModel = new DefaultTableModel(columnNames, 0);
-    StudentDAOImp dao = null;
+    StudentDAO dao = null;
+    
     
     public RegisterationForm() {
         initComponents();
@@ -33,7 +37,8 @@ public class RegisterationForm extends javax.swing.JFrame {
         buttonGroup1.add(femaleRadio);
         
         departmentCombo.addItem("          -------SELECT------");
-        List <String> x = dao.getAlldepartments();
+        DepartmentDAO dd = new DepartmentDAOImp();
+        List <String> x = dd.getAlldepartments();
         for(String e : x){
             departmentCombo.addItem(e);
         }
@@ -59,11 +64,15 @@ public class RegisterationForm extends javax.swing.JFrame {
         
         for(Student std : stdList){
             
-           Object[] row = {std.getName(), std.getRollNo(), std.getAge(), std.getFee(), std.getEmail(), std.getGender(), std.getDepartment(),std.getCity(), std.getAddress()};
+           Object[] row = {std.getId(),std.getName(), std.getRollNo(), std.getAge(), std.getFee(), std.getEmail(), std.getGender(), std.getDepartment(),std.getCity(), std.getAddress()};
            defaultTableModel.addRow(row);
         }
         
         studentTable.setModel(defaultTableModel);
+        studentTable.getColumnModel().getColumn(0).setWidth(0);
+        studentTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        studentTable.getColumnModel().getColumn(0).setMinWidth(0);
+        studentTable.getColumnModel().getColumn(0).setPreferredWidth(0);
     }
     
     boolean isValidData(){
@@ -479,10 +488,13 @@ public class RegisterationForm extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        if(studentTable.getSelectedRow() != -1){
+        int rowIndex = studentTable.getSelectedRow();
+        int studentId = 0;
+        
+        if(rowIndex != -1){
             
-            Student s = getAllUserData();
-            dao.deleteStudent(s);
+            studentId = Integer.parseInt(studentTable.getValueAt(rowIndex, 0).toString());
+            dao.deleteStudent(studentId);
             fillTable();
         }
         else {
@@ -492,11 +504,13 @@ public class RegisterationForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+       
+        int rowIndex = studentTable.getSelectedRow();
         
-        if(studentTable.getSelectedRow() != -1){
+        if(rowIndex != -1){
             
             Student s = getAllUserData();
+            s.setId(Integer.parseInt(studentTable.getValueAt(rowIndex, 0).toString()));
             dao.updateStudent(s);
             fillTable();
         }
@@ -547,14 +561,14 @@ public class RegisterationForm extends javax.swing.JFrame {
     }//GEN-LAST:event_nameFieldActionPerformed
 
     private void nameFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameFieldKeyTyped
-        // TODO add your handling code here:
-         char c = evt.getKeyChar();
         
-        if(!(Character.isLetter(c) || Character.isISOControl(c)) || Character.isSpaceChar(c)){
+        char c = evt.getKeyChar();
+        System.out.println(c + "h");
+        if(!(Character.isLetter(c) || Character.isISOControl(c))|| Character.isWhitespace(c) || Character.isSpaceChar(c)){
         
             evt.consume();
             getToolkit().beep();
-            JOptionPane.showMessageDialog(this, "Only Numbers Letters!");
+            JOptionPane.showMessageDialog(this, "Only Numbers and Letters!");
         }
     }//GEN-LAST:event_nameFieldKeyTyped
 
@@ -600,11 +614,11 @@ public class RegisterationForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         char c = evt.getKeyChar();
         
-        if(!(Character.isLetter(c) || Character.isISOControl(c) || Character.isSpaceChar(c))){
+        if(!(Character.isLetterOrDigit(c) || Character.isISOControl(c))){
         
             evt.consume();
             getToolkit().beep();
-            JOptionPane.showMessageDialog(this, "Only Numbers Letters!");
+            JOptionPane.showMessageDialog(this, "Only Numbers and Letters!");
         }
     }//GEN-LAST:event_emailFieldKeyTyped
 
@@ -622,14 +636,15 @@ public class RegisterationForm extends javax.swing.JFrame {
         int i = 0;
         
         if (studentTable.getSelectedRow() != -1) {
+            
             i = studentTable.getSelectedRow();
-            nameField.setText(studentTable.getValueAt(i, 0).toString());
-            rollNoField.setText(studentTable.getValueAt(i, 1).toString());
-            ageSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 2).toString()));
-            feeSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 3).toString()));
-            emailField.setText(studentTable.getValueAt(i, 4).toString());
+            nameField.setText(studentTable.getValueAt(i, 1).toString());
+            rollNoField.setText(studentTable.getValueAt(i, 2).toString());
+            ageSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 3).toString()));
+            feeSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 4).toString()));
+            emailField.setText(studentTable.getValueAt(i, 5).toString());
 
-            if (studentTable.getValueAt(i, 5).toString().equalsIgnoreCase("Male")) {
+            if (studentTable.getValueAt(i, 6).toString().equalsIgnoreCase("Male")) {
                
                 maleRadio.setSelected(true);
             } else {
@@ -637,9 +652,9 @@ public class RegisterationForm extends javax.swing.JFrame {
                 
             }
 
-            departmentCombo.setSelectedItem(studentTable.getValueAt(i, 6).toString());
-            cityCombo.setSelectedItem(studentTable.getValueAt(i, 7).toString());
-            addressArea.setText(studentTable.getValueAt(i, 8).toString());
+            departmentCombo.setSelectedItem(studentTable.getValueAt(i, 7).toString());
+            cityCombo.setSelectedItem(studentTable.getValueAt(i, 8).toString());
+            addressArea.setText(studentTable.getValueAt(i, 9).toString());
 
         }
     }
