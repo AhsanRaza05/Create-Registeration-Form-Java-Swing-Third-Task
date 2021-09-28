@@ -64,7 +64,7 @@ public class RegisterationForm extends javax.swing.JFrame {
         
         for(Student std : stdList){
             
-           Object[] row = {std.getId(),std.getName(), std.getRollNo(), std.getAge(), std.getFee(), std.getEmail(), std.getGender(), std.getDepartment(),std.getCity(), std.getAddress()};
+           Object[] row = {std.getId(),std.getName(), std.getRollNo(), std.getAge(), std.getFee(), std.getEmail(), std.getGender(), new DepartmentDAOImp().getDepartmentName(std.getDepartmentId()),std.getCity(), std.getAddress()};
            defaultTableModel.addRow(row);
         }
         
@@ -139,7 +139,7 @@ public class RegisterationForm extends javax.swing.JFrame {
             s.setGender(femaleRadio.getText());
         }
         
-        s.setDepartment(departmentCombo.getSelectedItem().toString().trim());
+        s.setDepartmentId(new DepartmentDAOImp().getDepartmentId(departmentCombo.getSelectedItem().toString().trim()));
         
         s.setCity(cityCombo.getSelectedItem().toString().trim());
         
@@ -147,11 +147,48 @@ public class RegisterationForm extends javax.swing.JFrame {
         
         System.out.println(s.getAge());
         System.out.println(s.getFee());
-        System.out.println(s.getDepartment());
+        System.out.println(s.getDepartmentId());
         
         return s;
     }
     
+    void setValues(int i) {
+
+        i = studentTable.getSelectedRow();
+        nameField.setText(studentTable.getValueAt(i, 1).toString());
+        rollNoField.setText(studentTable.getValueAt(i, 2).toString());
+        ageSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 3).toString()));
+        feeSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 4).toString()));
+        emailField.setText(studentTable.getValueAt(i, 5).toString());
+
+        if (studentTable.getValueAt(i, 6).toString().equalsIgnoreCase("Male")) {
+
+            maleRadio.setSelected(true);
+        } else {
+            femaleRadio.setSelected(true);
+
+        }
+
+        departmentCombo.setSelectedItem(studentTable.getValueAt(i, 7).toString());
+        cityCombo.setSelectedItem(studentTable.getValueAt(i, 8).toString());
+        addressArea.setText(studentTable.getValueAt(i, 9).toString());
+
+    }
+   
+    void resetValues() {
+
+        nameField.setText("");
+        rollNoField.setText("");
+        ageSpinner.setValue(0);
+        feeSpinner.setValue(0);
+        emailField.setText("");
+        maleRadio.setSelected(false);
+        femaleRadio.setSelected(false);
+        
+        departmentCombo.setSelectedIndex(0);
+        cityCombo.setSelectedIndex(0);
+        addressArea.setText("");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -477,13 +514,17 @@ public class RegisterationForm extends javax.swing.JFrame {
             Student s = getAllUserData();
             dao.addStudent(s);
             fillTable();
+            resetValues();
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void studentTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studentTableMouseClicked
-        // TODO add your handling code here:
-        setValues();
+        
+        if (studentTable.getSelectedRow() != -1) {
+            setValues(studentTable.getSelectedRow());
+        }
+        
     }//GEN-LAST:event_studentTableMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -496,6 +537,7 @@ public class RegisterationForm extends javax.swing.JFrame {
             studentId = Integer.parseInt(studentTable.getValueAt(rowIndex, 0).toString());
             dao.deleteStudent(studentId);
             fillTable();
+            resetValues();
         }
         else {
             
@@ -543,7 +585,7 @@ public class RegisterationForm extends javax.swing.JFrame {
     }//GEN-LAST:event_emailFieldActionPerformed
 
     private void emailFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_emailFieldKeyReleased
-        // TODO add your handling code here:
+       
         char c = evt.getKeyChar();
         
         if(!(Character.isLetter(c) || Character.isISOControl(c))){
@@ -555,7 +597,7 @@ public class RegisterationForm extends javax.swing.JFrame {
     }//GEN-LAST:event_emailFieldKeyReleased
 
     private void nameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameFieldActionPerformed
-        // TODO add your handling code here:
+       
         rollNoField.requestFocusInWindow();
        
     }//GEN-LAST:event_nameFieldActionPerformed
@@ -631,33 +673,7 @@ public class RegisterationForm extends javax.swing.JFrame {
         ageSpinner.requestFocusInWindow();
     }//GEN-LAST:event_rollNoFieldActionPerformed
 
-    void setValues() {
-
-        int i = 0;
-        
-        if (studentTable.getSelectedRow() != -1) {
-            
-            i = studentTable.getSelectedRow();
-            nameField.setText(studentTable.getValueAt(i, 1).toString());
-            rollNoField.setText(studentTable.getValueAt(i, 2).toString());
-            ageSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 3).toString()));
-            feeSpinner.setValue(Integer.valueOf(studentTable.getValueAt(i, 4).toString()));
-            emailField.setText(studentTable.getValueAt(i, 5).toString());
-
-            if (studentTable.getValueAt(i, 6).toString().equalsIgnoreCase("Male")) {
-               
-                maleRadio.setSelected(true);
-            } else {
-                femaleRadio.setSelected(true);
-                
-            }
-
-            departmentCombo.setSelectedItem(studentTable.getValueAt(i, 7).toString());
-            cityCombo.setSelectedItem(studentTable.getValueAt(i, 8).toString());
-            addressArea.setText(studentTable.getValueAt(i, 9).toString());
-
-        }
-    }
+    
     /**
      * @param args the command line arguments
      */
